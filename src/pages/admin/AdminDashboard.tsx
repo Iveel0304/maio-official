@@ -1,42 +1,136 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { articles, events, mediaItems } from '@/lib/mockData';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, FileText, Plus, Image, TrendingUp, Eye } from 'lucide-react';
+import { CalendarDays, FileText, Plus, Image, TrendingUp, Eye, Building2, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
+import NewsManager from '@/components/admin/NewsManager';
+import EventsManager from '@/components/admin/EventsManager';
+import MediaManager from '@/components/admin/MediaManager';
+import ResultsManager from '@/components/admin/ResultsManager';
+import SponsorsManager from '@/components/admin/SponsorsManager';
+import { newsApi, eventsApi, mediaApi, resultsApi, sponsorsApi } from '@/lib/api';
 
 export default function AdminDashboard() {
   const { language } = useLanguage();
   const { user } = useAuth();
+  const location = useLocation();
+  const [stats, setStats] = useState({
+    articles: 0,
+    events: 0,
+    media: 0,
+    results: 0,
+    sponsors: 0
+  });
   
-  const stats = [
+  // Fetch stats on component mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [articlesRes, eventsRes, mediaRes, resultsRes, sponsorsRes] = await Promise.all([
+          newsApi.getNews({ limit: 1 }),
+          eventsApi.getEvents({ limit: 1 }),
+          mediaApi.getMedia({ limit: 1 }),
+          resultsApi.getResults({ limit: 1 }),
+          sponsorsApi.getSponsors()
+        ]);
+        
+        setStats({
+          articles: articlesRes.pagination?.total || 0,
+          events: eventsRes.pagination?.total || 0,
+          media: mediaRes.pagination?.total || 0,
+          results: resultsRes.pagination?.total || 0,
+          sponsors: (sponsorsRes.data || []).length
+        });
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+      }
+    };
+    
+    fetchStats();
+  }, []);
+  
+  // Route to different management components
+  const isArticlesRoute = location.pathname.includes('/articles');
+  const isEventsRoute = location.pathname.includes('/events');
+  const isGalleryRoute = location.pathname.includes('/gallery');
+  const isResultsRoute = location.pathname.includes('/results');
+  const isSponsorsRoute = location.pathname.includes('/sponsors');
+  
+  if (isArticlesRoute) {
+    return (
+      <AdminLayout>
+        <NewsManager />
+      </AdminLayout>
+    );
+  }
+  
+  if (isEventsRoute) {
+    return (
+      <AdminLayout>
+        <EventsManager />
+      </AdminLayout>
+    );
+  }
+  
+  if (isGalleryRoute) {
+    return (
+      <AdminLayout>
+        <MediaManager />
+      </AdminLayout>
+    );
+  }
+  
+  if (isResultsRoute) {
+    return (
+      <AdminLayout>
+        <ResultsManager />
+      </AdminLayout>
+    );
+  }
+  
+  if (isSponsorsRoute) {
+    return (
+      <AdminLayout>
+        <SponsorsManager />
+      </AdminLayout>
+    );
+  }
+  
+  const dashboardStats = [
     {
       title: { en: 'Total Articles', mn: 'Нийт мэдээ' },
-      value: articles.length,
+      value: stats.articles,
       icon: FileText,
       color: 'text-blue-500',
     },
     {
-      title: { en: 'Upcoming Events', mn: 'Ирэх арга хэмжээ' },
-      value: events.filter(event => new Date(event.date) >= new Date()).length,
+      title: { en: 'Total Events', mn: 'Нийт арга хэмжээ' },
+      value: stats.events,
       icon: CalendarDays,
       color: 'text-amber-500',
     },
     {
       title: { en: 'Media Items', mn: 'Медиа' },
-      value: mediaItems.length,
+      value: stats.media,
       icon: Image,
       color: 'text-purple-500',
     },
     {
-      title: { en: 'Featured Articles', mn: 'Онцлох мэдээ' },
-      value: articles.filter(article => article.featured).length,
-      icon: TrendingUp,
+      title: { en: 'Results', mn: 'Үр дүн' },
+      value: stats.results,
+      icon: Trophy,
       color: 'text-green-500',
+    },
+    {
+      title: { en: 'Sponsors', mn: 'Ивээн тэтгэгч' },
+      value: stats.sponsors,
+      icon: Building2,
+      color: 'text-indigo-500',
     },
   ];
 
@@ -58,8 +152,8 @@ export default function AdminDashboard() {
         </div>
         
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, index) => (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+          {dashboardStats.map((stat, index) => (
             <Card key={index}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -76,83 +170,96 @@ export default function AdminDashboard() {
           ))}
         </div>
         
-        {/* Recent Content */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Recent Articles */}
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle>
-                {language === 'en' ? 'Recent Articles' : 'Сүүлийн мэдээнүүд'}
-              </CardTitle>
-              <CardDescription>
-                {language === 'en' 
-                  ? 'Recently published or updated articles'
-                  : 'Саяхан нийтлэгдсэн эсвэл шинэчлэгдсэн мэдээнүүд'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {articles
-                  .sort((a, b) => new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime())
-                  .slice(0, 5)
-                  .map((article) => (
-                    <div key={article.id} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{article.title[language]}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(article.publishDate), 'PPP')}
-                        </p>
-                      </div>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link to={`/admin/articles/edit/${article.id}`}>
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  ))}
+        {/* Quick Navigation */}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-blue-100 rounded-full">
+                  <FileText className="h-6 w-6 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">
+                    {language === 'en' ? 'Manage Articles' : 'Мэдээ удирдах'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'en' ? 'Create and edit news articles' : 'Мэдээ бичиж засварлах'}
+                  </p>
+                  <Link to="/admin/articles">
+                    <Button size="sm" className="mt-2">
+                      {language === 'en' ? 'Go to Articles' : 'Мэдээ рүү очих'}
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>
           
-          {/* Upcoming Events */}
-          <Card className="col-span-1">
-            <CardHeader>
-              <CardTitle>
-                {language === 'en' ? 'Upcoming Events' : 'Ирэх арга хэмжээнүүд'}
-              </CardTitle>
-              <CardDescription>
-                {language === 'en' 
-                  ? 'Events scheduled in the near future'
-                  : 'Ойрын ирээдүйд төлөвлөгдсөн арга хэмжээнүүд'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {events
-                  .filter(event => new Date(event.date) >= new Date())
-                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                  .slice(0, 5)
-                  .map((event) => (
-                    <div key={event.id} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{event.title[language]}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {format(new Date(event.date), 'PPP')} - {event.time}
-                        </p>
-                      </div>
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link to={`/admin/events/edit/${event.id}`}>
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </div>
-                  ))}
-
-                {events.filter(event => new Date(event.date) >= new Date()).length === 0 && (
-                  <p className="text-muted-foreground text-sm">
-                    {language === 'en' ? 'No upcoming events' : 'Ирэх арга хэмжээ алга байна'}
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-amber-100 rounded-full">
+                  <CalendarDays className="h-6 w-6 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">
+                    {language === 'en' ? 'Manage Events' : 'Арга хэмжээ удирдах'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'en' ? 'Schedule and organize events' : 'Арга хэмжээ зохион байгуулах'}
                   </p>
-                )}
+                  <Link to="/admin/events">
+                    <Button size="sm" className="mt-2">
+                      {language === 'en' ? 'Go to Events' : 'Арга хэмжээ рүү очих'}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-green-100 rounded-full">
+                  <Trophy className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">
+                    {language === 'en' ? 'Manage Results' : 'Үр дүн удирдах'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'en' ? 'Add competition results' : 'Тэмцээний үр дүн нэмэх'}
+                  </p>
+                  <Link to="/admin/results">
+                    <Button size="sm" className="mt-2">
+                      {language === 'en' ? 'Go to Results' : 'Үр дүн рүү очих'}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="p-3 bg-indigo-100 rounded-full">
+                  <Building2 className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">
+                    {language === 'en' ? 'Manage Sponsors' : 'Ивээн тэтгэгч удирдах'}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {language === 'en' ? 'Add and manage sponsors' : 'Ивээн тэтгэгч нэмж удирдах'}
+                  </p>
+                  <Link to="/admin/sponsors">
+                    <Button size="sm" className="mt-2">
+                      {language === 'en' ? 'Go to Sponsors' : 'Ивээн тэтгэгч рүү очих'}
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>

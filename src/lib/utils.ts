@@ -13,12 +13,38 @@ export function formatDate(dateString: string, language: Language = 'en'): strin
   if (language === 'en') {
     return format(date, 'MMMM d, yyyy');
   } else {
-    // Mongolian date format
-    const day = date.getDate();
-    const month = date.toLocaleString('mn-MN', { month: 'long' });
+    // Proper Mongolian date format: Year-Month-Day
     const year = date.getFullYear();
-    return `${year} оны ${month} сарын ${day}`;
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
+}
+
+export function formatDateLong(dateString: string, language: Language = 'en'): string {
+  const date = new Date(dateString);
+  
+  if (language === 'en') {
+    return format(date, 'MMMM d, yyyy');
+  } else {
+    // Mongolian long date format
+    const mongolianMonths = [
+      '1-р сар', '2-р сар', '3-р сар', '4-р сар',
+      '5-р сар', '6-р сар', '7-р сар', '8-р сар',
+      '9-р сар', '10-р сар', '11-р сар', '12-р сар'
+    ];
+    
+    const year = date.getFullYear();
+    const month = mongolianMonths[date.getMonth()];
+    const day = date.getDate();
+    
+    return `${year} оны ${month} ${day}`;
+  }
+}
+
+// Generate view count for articles (simulated)
+export function generateViewCount(): number {
+  return Math.floor(Math.random() * 2000) + 500;
 }
 
 export function truncateText(text: string, maxLength: number): string {

@@ -41,14 +41,30 @@ const App = () => (
                 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<AdminDashboard />} />
+                
+                {/* Articles Management */}
                 <Route path="/admin/articles" element={<AdminDashboard />} />
                 <Route path="/admin/articles/new" element={<AdminDashboard />} />
                 <Route path="/admin/articles/edit/:id" element={<AdminDashboard />} />
+                
+                {/* Events Management */}
                 <Route path="/admin/events" element={<AdminDashboard />} />
                 <Route path="/admin/events/new" element={<AdminDashboard />} />
                 <Route path="/admin/events/edit/:id" element={<AdminDashboard />} />
-                <Route path="/admin/results" element={<AdminDashboard />} />
+                
+                {/* Media/Gallery Management */}
                 <Route path="/admin/gallery" element={<AdminDashboard />} />
+                <Route path="/admin/gallery/upload" element={<AdminDashboard />} />
+                
+                {/* Results Management */}
+                <Route path="/admin/results" element={<AdminDashboard />} />
+                <Route path="/admin/results/new" element={<AdminDashboard />} />
+                <Route path="/admin/results/edit/:id" element={<AdminDashboard />} />
+                
+                {/* Sponsors Management */}
+                <Route path="/admin/sponsors" element={<AdminDashboard />} />
+                
+                {/* Settings */}
                 <Route path="/admin/settings" element={<AdminDashboard />} />
                 
                 {/* 404 Route */}

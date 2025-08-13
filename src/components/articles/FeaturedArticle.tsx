@@ -64,7 +64,7 @@ const FeaturedArticle = ({ article }: FeaturedArticleProps) => {
           </p>
           
           <Button size="lg" asChild>
-            <Link to={`/news/${article.id}`}>
+            <Link to={`/news/${article._id || article.id}`}>
               {language === 'en' ? 'Read Article' : 'Мэдээлэл унших'}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

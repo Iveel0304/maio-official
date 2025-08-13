@@ -72,7 +72,7 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
               
               <div className="space-y-4">
                 {upcomingEventsByDate[dateKey].map((event) => (
-                  <Card key={event.id} className="overflow-hidden">
+                  <Card key={event._id || event.id} className="overflow-hidden">
                     <CardContent className="p-0">
                       <div className="flex flex-col md:flex-row">
                         {event.imageUrl && (
@@ -94,7 +94,7 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
                             </div>
                             <div className="flex items-center gap-2">
                               <MapPin className="h-4 w-4 text-muted-foreground" />
-                              <span>{event.location}</span>
+                              <span>{typeof event.location === 'string' ? event.location : t(event.location)}</span>
                             </div>
                           </div>
                           <p className="text-muted-foreground">{t(event.description)}</p>
@@ -124,7 +124,7 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
         {pastEvents.length > 0 ? (
           <div className="space-y-4">
             {pastEvents.map((event) => (
-              <Card key={event.id} className="overflow-hidden">
+              <Card key={event._id || event.id} className="overflow-hidden">
                 <CardContent className="p-0">
                   <div className="flex flex-col md:flex-row">
                     {event.imageUrl && (
@@ -152,7 +152,7 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span>{event.location}</span>
+                          <span>{typeof event.location === 'string' ? event.location : t(event.location)}</span>
                         </div>
                       </div>
                       <p className="text-muted-foreground">{t(event.description)}</p>

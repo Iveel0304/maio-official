@@ -13,7 +13,7 @@ const CompetitionResults = ({ competitions }: CompetitionResultsProps) => {
   
   // Sort competitions by year in descending order
   const sortedCompetitions = [...competitions].sort((a, b) => 
-    parseInt(b.year) - parseInt(a.year)
+    (typeof b.year === 'number' ? b.year : parseInt(b.year)) - (typeof a.year === 'number' ? a.year : parseInt(a.year))
   );
   
   const getTrophyColor = (place: number): string => {
@@ -28,11 +28,14 @@ const CompetitionResults = ({ competitions }: CompetitionResultsProps) => {
   return (
     <div className="space-y-8">
       {sortedCompetitions.map((competition) => (
-        <Card key={competition.id} className="overflow-hidden">
+        <Card key={competition._id || competition.id} className="overflow-hidden">
           <CardHeader>
             <h2 className="text-2xl font-bold">
-              {t(competition.name)}
+              {t(competition.title)}
             </h2>
+            <p className="text-muted-foreground">
+              {t(competition.description)}
+            </p>
           </CardHeader>
           <CardContent>
             <Table>
@@ -42,10 +45,10 @@ const CompetitionResults = ({ competitions }: CompetitionResultsProps) => {
                     {language === 'en' ? 'Rank' : 'Байр'}
                   </TableHead>
                   <TableHead>
-                    {language === 'en' ? 'Team / Participant' : 'Баг / Оролцогч'}
+                    {language === 'en' ? 'Team' : 'Баг'}
                   </TableHead>
                   <TableHead>
-                    {language === 'en' ? 'Project' : 'Төсөл'}
+                    {language === 'en' ? 'Members' : 'Гишүүд'}
                   </TableHead>
                   <TableHead className="text-right">
                     {language === 'en' ? 'Score' : 'Оноо'}
@@ -53,17 +56,17 @@ const CompetitionResults = ({ competitions }: CompetitionResultsProps) => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {competition.winners.map((winner) => (
-                  <TableRow key={`${competition.id}-${winner.place}`}>
+                {competition.rankings.map((ranking) => (
+                  <TableRow key={`${competition._id || competition.id}-${ranking.rank}`}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
-                        <Trophy className={`h-4 w-4 ${getTrophyColor(winner.place)}`} />
-                        <span>{winner.place}</span>
+                        <Trophy className={`h-4 w-4 ${getTrophyColor(ranking.rank)}`} />
+                        <span>{ranking.rank}</span>
                       </div>
                     </TableCell>
-                    <TableCell>{winner.name}</TableCell>
-                    <TableCell>{winner.project}</TableCell>
-                    <TableCell className="text-right">{winner.score}</TableCell>
+                    <TableCell>{ranking.team}</TableCell>
+                    <TableCell>{ranking.members.join(', ')}</TableCell>
+                    <TableCell className="text-right">{ranking.score}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

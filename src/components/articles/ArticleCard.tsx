@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
 import { CalendarIcon, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import SafeHtmlRenderer from '@/components/ui/SafeHtmlRenderer';
 
 interface ArticleCardProps {
   article: Article;
@@ -39,7 +40,7 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
   return (
     <Card className={`overflow-hidden h-full flex flex-col ${featured ? 'lg:flex-row' : ''}`}>
       <div className={`${featured ? 'lg:w-1/2' : 'w-full'}`}>
-        <Link to={`/news/${article.id}`}>
+        <Link to={`/news/${article._id || article.id}`}>
           <div className="aspect-video relative overflow-hidden">
             <img 
               src={article.imageUrl || '/images/placeholder.jpg'}
@@ -60,7 +61,7 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
               <Clock size={14} /> {timeAgo}
             </span>
           </div>
-          <Link to={`/news/${article.id}`} className="hover:underline">
+          <Link to={`/news/${article._id || article.id}`} className="hover:underline">
             <h3 className={`font-bold ${featured ? 'text-2xl' : 'text-xl'}`}>
               {t(article.title)}
             </h3>
@@ -76,7 +77,7 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
         <CardFooter className="pt-2 flex justify-between">
           <span className="text-sm text-muted-foreground">{article.author}</span>
           <Link 
-            to={`/news/${article.id}`} 
+            to={`/news/${article._id || article.id}`} 
             className="text-primary hover:underline text-sm font-medium"
           >
             {language === 'en' ? 'Read more' : 'Дэлгэрэнгүй'}

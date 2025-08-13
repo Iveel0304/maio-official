@@ -1,46 +1,80 @@
-import { Link } from 'react-router-dom';
-import { Facebook, Instagram, Twitter, Youtube, Github } from 'lucide-react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { sponsors } from '@/lib/mockData';
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Facebook, Instagram, Twitter, Youtube, Github, ExternalLink } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { sponsorsApi } from "@/lib/api";
+
+interface Sponsor {
+  _id?: string;
+  id?: string;
+  name: string;
+  logo?: string;
+  logoUrl?: string;
+  website: string;
+  tier: 'platinum' | 'gold' | 'silver' | 'bronze';
+  featured?: boolean;
+  active?: boolean;
+  description?: {
+    en: string;
+    mn: string;
+  };
+}
 
 const Footer = () => {
   const { language, t } = useLanguage();
-  
+  const [sponsors, setSponsors] = useState<Sponsor[]>([]);
+  const [isLoadingSponsors, setIsLoadingSponsors] = useState(true);
+
+  useEffect(() => {
+    const loadSponsors = async () => {
+      try {
+        const data = await sponsorsApi.getAll();
+        setSponsors(data);
+      } catch (error) {
+        console.error('Failed to load sponsors:', error);
+      } finally {
+        setIsLoadingSponsors(false);
+      }
+    };
+    loadSponsors();
+  }, []);
+
   const footerLinks = {
     en: {
       about: [
-        { title: 'About MAIO', href: '/about' },
-        { title: 'Team', href: '/team' },
-        { title: 'Contact', href: '/contact' },
+        { title: "About MAIO", href: "/about" },
+        { title: "Team", href: "/team" },
+        { title: "Contact", href: "/contact" },
       ],
       resources: [
-        { title: 'Rules & Guidelines', href: '/rules' },
-        { title: 'FAQs', href: '/faqs' },
-        { title: 'Past Competitions', href: '/past-competitions' },
+        { title: "Rules & Guidelines", href: "/rules" },
+        { title: "FAQs", href: "/faqs" },
+        { title: "Past Competitions", href: "/past-competitions" },
       ],
       legal: [
-        { title: 'Terms of Service', href: '/terms' },
-        { title: 'Privacy Policy', href: '/privacy' },
-      ]
+        { title: "Terms of Service", href: "/terms" },
+        { title: "Privacy Policy", href: "/privacy" },
+      ],
     },
     mn: {
       about: [
-        { title: 'MAIO-ийн тухай', href: '/about' },
-        { title: 'Баг', href: '/team' },
-        { title: 'Холбоо барих', href: '/contact' },
+        { title: "MAIO-ийн тухай", href: "/about" },
+        { title: "Баг", href: "/team" },
+        { title: "Холбоо барих", href: "/contact" },
       ],
       resources: [
-        { title: 'Дүрэм & Удирдамж', href: '/rules' },
-        { title: 'Түгээмэл асуултууд', href: '/faqs' },
-        { title: 'Өмнөх тэмцээнүүд', href: '/past-competitions' },
+        { title: "Дүрэм & Удирдамж", href: "/rules" },
+        { title: "Түгээмэл асуултууд", href: "/faqs" },
+        { title: "Өмнөх тэмцээнүүд", href: "/past-competitions" },
       ],
       legal: [
-        { title: 'Үйлчилгээний нөхцөл', href: '/terms' },
-        { title: 'Нууцлалын бодлого', href: '/privacy' },
-      ]
-    }
+        { title: "Үйлчилгээний нөхцөл", href: "/terms" },
+        { title: "Нууцлалын бодлого", href: "/privacy" },
+      ],
+    },
   };
-  
+
   return (
     <footer className="bg-background border-t">
       <div className="container py-8 md:py-12">
@@ -51,9 +85,9 @@ const Footer = () => {
               <span className="font-bold text-xl">MAIO</span>
             </Link>
             <p className="text-muted-foreground mb-4">
-              {language === 'en' 
-                ? 'The Mongolian AI Olympiad is the premier artificial intelligence competition in Mongolia.'
-                : 'Монголын AI Олимпиад бол Монгол Улсын хиймэл оюун ухааны тэргүүлэх тэмцээн юм.'}
+              {language === "en"
+                ? "The Mongolian AI Olympiad is the premier artificial intelligence competition in Mongolia."
+                : "Монголын AI Олимпиад бол Монгол Улсын хиймэл оюун ухааны тэргүүлэх тэмцээн юм."}
             </p>
             <div className="flex space-x-4">
               <a href="#" aria-label="Facebook" className="hover:text-primary">
@@ -77,12 +111,15 @@ const Footer = () => {
           {/* Links */}
           <div>
             <h3 className="font-medium text-lg mb-4">
-              {language === 'en' ? 'About' : 'Тухай'}
+              {language === "en" ? "About" : "Тухай"}
             </h3>
             <ul className="space-y-2">
               {footerLinks[language].about.map((link, i) => (
                 <li key={i}>
-                  <Link to={link.href} className="text-muted-foreground hover:text-foreground">
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     {link.title}
                   </Link>
                 </li>
@@ -92,12 +129,15 @@ const Footer = () => {
 
           <div>
             <h3 className="font-medium text-lg mb-4">
-              {language === 'en' ? 'Resources' : 'Материалууд'}
+              {language === "en" ? "Resources" : "Материалууд"}
             </h3>
             <ul className="space-y-2">
               {footerLinks[language].resources.map((link, i) => (
                 <li key={i}>
-                  <Link to={link.href} className="text-muted-foreground hover:text-foreground">
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     {link.title}
                   </Link>
                 </li>
@@ -107,12 +147,15 @@ const Footer = () => {
 
           <div>
             <h3 className="font-medium text-lg mb-4">
-              {language === 'en' ? 'Legal' : 'Хууль эрхзүй'}
+              {language === "en" ? "Legal" : "Хууль эрхзүй"}
             </h3>
             <ul className="space-y-2">
               {footerLinks[language].legal.map((link, i) => (
                 <li key={i}>
-                  <Link to={link.href} className="text-muted-foreground hover:text-foreground">
+                  <Link
+                    to={link.href}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
                     {link.title}
                   </Link>
                 </li>
@@ -121,32 +164,89 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Sponsors */}
-        <div className="mt-12 pt-8 border-t">
-          <h3 className="text-center font-medium text-lg mb-6">
-            {language === 'en' ? 'Our Sponsors' : 'Ивээн тэтгэгчид'}
-          </h3>
-          <div className="flex flex-wrap justify-center items-center gap-8">
-            {sponsors.map((sponsor) => (
-              <a 
-                key={sponsor.id} 
-                href={sponsor.websiteUrl} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="grayscale hover:grayscale-0 transition-all"
-              >
-                <div className="h-8 w-24 bg-gray-100 dark:bg-gray-800 flex items-center justify-center rounded">
-                  {sponsor.name}
+        {/* Sponsors Section */}
+        {!isLoadingSponsors && sponsors.length > 0 && (
+          <div className="mt-12 pt-8 border-t">
+            <h3 className="font-medium text-lg mb-6 text-center">
+              {language === "en" ? "Our Sponsors" : "Бидний ивээн тэтгэгчид"}
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center">
+              {sponsors
+                .filter(sponsor => sponsor.featured)
+                .sort((a, b) => {
+                  const tierOrder = { organizer: 0, platinum: 1, gold: 2, main: 2, silver: 3, sponsor: 3, bronze: 4, supporter: 4 };
+                  return (tierOrder[a.tier] || 5) - (tierOrder[b.tier] || 5);
+                })
+                .map((sponsor) => {
+                  const sponsorId = sponsor._id || sponsor.id;
+                  return (
+                    <motion.a
+                      key={sponsorId}
+                      href={sponsor.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center justify-center p-3 rounded-lg border hover:border-primary/50 hover:shadow-md transition-all duration-300 bg-card"
+                      whileHover={{ scale: 1.05, y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                      title={`${sponsor.name} - ${language === "en" ? "Visit website" : "Веб хуудас руу очих"}`}
+                    >
+                      <div className="relative w-full h-12 flex items-center justify-center">
+                        <img
+                          src={sponsor.logoUrl || sponsor.logo || '/images/placeholder.jpg'}
+                          alt={sponsor.name}
+                          className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                          loading="lazy"
+                        />
+                        <ExternalLink className="absolute top-1 right-1 h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+                      </div>
+                    </motion.a>
+                  );
+                })}
+            </div>
+            {sponsors.filter(sponsor => !sponsor.featured).length > 0 && (
+              <div className="mt-6">
+                <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4 items-center">
+                  {sponsors
+                    .filter(sponsor => !sponsor.featured)
+                    .sort((a, b) => {
+                      const tierOrder = { organizer: 0, platinum: 1, gold: 2, main: 2, silver: 3, sponsor: 3, bronze: 4, supporter: 4 };
+                      return (tierOrder[a.tier] || 5) - (tierOrder[b.tier] || 5);
+                    })
+                    .map((sponsor) => {
+                      const sponsorId = sponsor._id || sponsor.id;
+                      return (
+                        <motion.a
+                          key={sponsorId}
+                          href={sponsor.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group flex items-center justify-center p-2 rounded border hover:border-primary/30 transition-all duration-300"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          title={`${sponsor.name} - ${language === "en" ? "Visit website" : "Веб хуудас руу очих"}`}
+                        >
+                          <img
+                            src={sponsor.logoUrl || sponsor.logo || '/images/placeholder.jpg'}
+                            alt={sponsor.name}
+                            className="max-w-full h-8 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
+                            loading="lazy"
+                          />
+                        </motion.a>
+                      );
+                    })}
                 </div>
-              </a>
-            ))}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Copyright */}
         <div className="mt-12 pt-6 border-t text-center text-sm text-muted-foreground">
           <p>
-            © {new Date().getFullYear()} {language === 'en' ? 'Mongolian AI Olympiad. All rights reserved.' : 'Монголын AI Олимпиад. Бүх эрх хуулиар хамгаалагдсан.'}
+            © {new Date().getFullYear()}{" "}
+            {language === "en"
+              ? "Mongolian AI Olympiad. All rights reserved."
+              : "Монголын AI Олимпиад. Бүх эрх хуулиар хамгаалагдсан."}
           </p>
         </div>
       </div>

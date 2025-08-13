@@ -12,7 +12,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -41,6 +42,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       { icon: Calendar, label: 'Events', href: '/admin/events' },
       { icon: Medal, label: 'Results', href: '/admin/results' },
       { icon: Image, label: 'Media Gallery', href: '/admin/gallery' },
+      { icon: Building2, label: 'Sponsors', href: '/admin/sponsors' },
       { icon: Users, label: 'Users', href: '/admin/users', adminOnly: true },
       { icon: Settings, label: 'Settings', href: '/admin/settings' },
     ],
@@ -50,6 +52,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
       { icon: Calendar, label: 'Арга хэмжээнүүд', href: '/admin/events' },
       { icon: Medal, label: 'Үр дүнгүүд', href: '/admin/results' },
       { icon: Image, label: 'Медиа галерей', href: '/admin/gallery' },
+      { icon: Building2, label: 'Ивээн тэтгэгчид', href: '/admin/sponsors' },
       { icon: Users, label: 'Хэрэглэгчид', href: '/admin/users', adminOnly: true },
       { icon: Settings, label: 'Тохиргоо', href: '/admin/settings' },
     ]

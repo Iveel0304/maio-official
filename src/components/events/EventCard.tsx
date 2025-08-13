@@ -50,7 +50,7 @@ const EventCard = ({ event }: EventCardProps) => {
           <div className="flex items-start gap-2">
             <MapPin className="h-4 w-4 text-muted-foreground mt-1" />
             <div>
-              <p>{event.location}</p>
+              <p>{typeof event.location === 'string' ? event.location : t(event.location)}</p>
             </div>
           </div>
         </div>

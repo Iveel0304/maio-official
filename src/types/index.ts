@@ -1,7 +1,8 @@
 export type Language = 'en' | 'mn';
 
 export interface Article {
-  id: string;
+  _id: string;
+  id?: string; // For backwards compatibility
   title: {
     en: string;
     mn: string;
@@ -21,10 +22,13 @@ export interface Article {
   imageUrl: string;
   tags: string[];
   featured?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Event {
-  id: string;
+  _id: string;
+  id?: string; // For backwards compatibility
   title: {
     en: string;
     mn: string;
@@ -35,25 +39,41 @@ export interface Event {
   };
   date: string;
   time: string;
-  location: string;
-  imageUrl?: string;
-}
-
-export interface Competition {
-  id: string;
-  name: {
+  location: {
     en: string;
     mn: string;
   };
-  year: string;
-  winners: Winner[];
+  category: string;
+  imageUrl?: string;
+  participants?: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Winner {
-  place: number;
-  name: string;
-  project?: string;
-  score?: number;
+export interface Competition {
+  _id: string;
+  id?: string; // For backwards compatibility
+  title: {
+    en: string;
+    mn: string;
+  };
+  description: {
+    en: string;
+    mn: string;
+  };
+  year: number;
+  date: string;
+  category: string;
+  rankings: ResultRanking[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ResultRanking {
+  rank: number;
+  team: string;
+  score: number;
+  members: string[];
 }
 
 export interface MediaItem {
@@ -70,11 +90,20 @@ export interface MediaItem {
 }
 
 export interface Sponsor {
-  id: string;
+  id?: string;
+  _id?: string;
   name: string;
-  logoUrl: string;
+  logoUrl?: string;
+  logo?: string;
   websiteUrl?: string;
-  tier?: 'platinum' | 'gold' | 'silver' | 'bronze' | 'partner';
+  website?: string;
+  tier: 'organizer' | 'main' | 'sponsor' | 'supporter' | 'gold' | 'silver' | 'bronze' | 'platinum';
+  featured?: boolean;
+  active?: boolean;
+  order?: number;
+  description?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface User {
