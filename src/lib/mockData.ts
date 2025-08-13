@@ -32,6 +32,7 @@ export const sampleArticle: Article = {
 // Mock Events
 export const events: Event[] = [
   {
+    _id: "1",
     id: "1",
     title: {
       en: "-----------",
@@ -43,8 +44,14 @@ export const events: Event[] = [
     },
     date: "2025-00-00",
     time: "00:00",
-    location: "-----------",
+    location: {
+      en: "-----------",
+      mn: "-----------",
+    },
+    category: "general",
     imageUrl: "/assets/images/opening-ceremony.jpg",
+    createdAt: "2025-01-01T00:00:00Z",
+    updatedAt: "2025-01-01T00:00:00Z",
   },
 ];
 

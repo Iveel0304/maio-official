@@ -63,13 +63,11 @@ const Header = () => {
             <NavigationMenuList>
               {navItems[language].map((item) => (
                 <NavigationMenuItem key={item.href}>
-                  <Link to={item.href} legacyBehavior passHref>
-                    <NavigationMenuLink
-                      className={navigationMenuTriggerStyle()}
-                    >
+                  <NavigationMenuLink asChild className={navigationMenuTriggerStyle()}>
+                    <Link to={item.href}>
                       {item.title}
-                    </NavigationMenuLink>
-                  </Link>
+                    </Link>
+                  </NavigationMenuLink>
                 </NavigationMenuItem>
               ))}
             </NavigationMenuList>

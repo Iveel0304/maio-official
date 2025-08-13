@@ -40,19 +40,12 @@ interface Sponsor {
   description: string;
   website?: string;
   logoUrl?: string;
-  tier: "gold" | "silver" | "bronze" | "supporter";
+  tier: "organizer" | "main" | "sponsor" | "supporter";
   active: boolean;
   order: number;
   createdAt?: string;
   updatedAt?: string;
 }
-
-const tiers = [
-  { value: "gold", label: "Gold Sponsor", color: "text-yellow-600" },
-  { value: "silver", label: "Silver Sponsor", color: "text-gray-500" },
-  { value: "bronze", label: "Bronze Sponsor", color: "text-amber-600" },
-  { value: "supporter", label: "Supporter", color: "text-blue-600" },
-];
 
 const initialSponsor: Omit<Sponsor, "_id"> = {
   name: "",
@@ -65,6 +58,29 @@ const initialSponsor: Omit<Sponsor, "_id"> = {
 
 export default function SponsorsManager() {
   const { language } = useLanguage();
+  
+  const tiers = [
+    { 
+      value: "organizer", 
+      label: language === "en" ? "Organizer" : "Зохион байгуулагч", 
+      color: "text-orange-600" 
+    },
+    { 
+      value: "main", 
+      label: language === "en" ? "Main Sponsor" : "Гол ивээн тэтгэгч", 
+      color: "text-blue-600" 
+    },
+    { 
+      value: "sponsor", 
+      label: language === "en" ? "Sponsor" : "Ивээн тэтгэгч", 
+      color: "text-green-600" 
+    },
+    { 
+      value: "supporter", 
+      label: language === "en" ? "Supporter" : "Дэмжигч", 
+      color: "text-gray-600" 
+    },
+  ];
   const [sponsors, setSponsors] = useState<Sponsor[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -438,17 +454,55 @@ export default function SponsorsManager() {
       )}
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-100 rounded-lg">
-                <Star className="h-5 w-5 text-yellow-600" />
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <Star className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Gold</p>
+                <p className="text-sm text-muted-foreground">
+                  {language === "en" ? "Organizers" : "Зохион байгуулагчид"}
+                </p>
                 <p className="text-2xl font-bold">
-                  {sponsors.filter((s) => s.tier === "gold" && s.active).length}
+                  {sponsors.filter((s) => s.tier === "organizer" && s.active).length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Star className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  {language === "en" ? "Main Sponsors" : "Гол ивээн тэтгэгчид"}
+                </p>
+                <p className="text-2xl font-bold">
+                  {sponsors.filter((s) => s.tier === "main" && s.active).length}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Star className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">
+                  {language === "en" ? "Sponsors" : "Ивээн тэтгэгчид"}
+                </p>
+                <p className="text-2xl font-bold">
+                  {sponsors.filter((s) => s.tier === "sponsor" && s.active).length}
                 </p>
               </div>
             </div>
@@ -459,15 +513,14 @@ export default function SponsorsManager() {
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gray-100 rounded-lg">
-                <Star className="h-5 w-5 text-gray-500" />
+                <Star className="h-5 w-5 text-gray-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Silver</p>
+                <p className="text-sm text-muted-foreground">
+                  {language === "en" ? "Supporters" : "Дэмжигчид"}
+                </p>
                 <p className="text-2xl font-bold">
-                  {
-                    sponsors.filter((s) => s.tier === "silver" && s.active)
-                      .length
-                  }
+                  {sponsors.filter((s) => s.tier === "supporter" && s.active).length}
                 </p>
               </div>
             </div>
@@ -477,30 +530,13 @@ export default function SponsorsManager() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-amber-100 rounded-lg">
-                <Star className="h-5 w-5 text-amber-600" />
+              <div className="p-2 bg-slate-100 rounded-lg">
+                <Building2 className="h-5 w-5 text-slate-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Bronze</p>
-                <p className="text-2xl font-bold">
-                  {
-                    sponsors.filter((s) => s.tier === "bronze" && s.active)
-                      .length
-                  }
+                <p className="text-sm text-muted-foreground">
+                  {language === "en" ? "Total Active" : "Нийт идэвхтэй"}
                 </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Building2 className="h-5 w-5 text-blue-600" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Active</p>
                 <p className="text-2xl font-bold">
                   {sponsors.filter((s) => s.active).length}
                 </p>
