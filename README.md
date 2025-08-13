@@ -376,3 +376,4 @@ npm run dev
 **Built with ❤️ for the Mongolian AI community** 🇲🇳
 
 *Ready to inspire the next generation of AI innovators in Mongolia!*
+# maio-turshilt
