@@ -736,6 +736,76 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// Data Management Endpoints
+
+// Get collection stats
+app.get('/api/stats', async (req, res) => {
+  try {
+    const stats = {
+      articles: await db.collection('articles').countDocuments(),
+      events: await db.collection('events').countDocuments(),
+      media: await db.collection('media').countDocuments(),
+      results: await db.collection('results').countDocuments(),
+      sponsors: await db.collection('sponsors').countDocuments()
+    };
+    res.json(stats);
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+    res.status(500).json({ error: 'Failed to fetch collection stats' });
+  }
+});
+
+// Clean up duplicates (for development use)
+app.post('/api/cleanup', async (req, res) => {
+  try {
+    const collections = ['articles', 'events', 'media', 'results', 'sponsors'];
+    const cleanupResults = {};
+
+    for (const collectionName of collections) {
+      // Find duplicates based on title or name
+      const pipeline = [
+        {
+          $group: {
+            _id: collectionName === 'sponsors' ? '$name' : '$title',
+            count: { $sum: 1 },
+            docs: { $push: '$$ROOT' }
+          }
+        },
+        {
+          $match: {
+            count: { $gt: 1 }
+          }
+        }
+      ];
+
+      const duplicates = await db.collection(collectionName).aggregate(pipeline).toArray();
+      let deletedCount = 0;
+
+      for (const duplicate of duplicates) {
+        // Keep the first document, delete the rest
+        const [keep, ...toDelete] = duplicate.docs;
+        for (const doc of toDelete) {
+          await db.collection(collectionName).deleteOne({ _id: doc._id });
+          deletedCount++;
+        }
+      }
+
+      cleanupResults[collectionName] = {
+        duplicateGroups: duplicates.length,
+        deletedDocuments: deletedCount
+      };
+    }
+
+    res.json({ 
+      message: 'Cleanup completed',
+      results: cleanupResults
+    });
+  } catch (error) {
+    console.error('Error during cleanup:', error);
+    res.status(500).json({ error: 'Failed to cleanup duplicates' });
+  }
+});
+
 // Function to find available port
 async function findAvailablePort(startPort) {
   const net = await import('net');
@@ -764,9 +834,11 @@ async function startServer() {
     sponsors: await db.collection('sponsors').countDocuments()
   };
 
-  // Initialize Articles
+  console.log('Current collections status:', collections);
+
+  // Initialize Articles only if completely empty
   if (collections.articles === 0) {
-    console.log('Initializing articles collection...');
+    console.log('Initializing articles collection with sample data...');
     const sampleArticles = [
       {
         title: {

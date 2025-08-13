@@ -56,66 +56,83 @@ export default function NewsPage() {
   };
   
   useEffect(() => {
+    let mounted = true;
+    
     const fetchData = async () => {
+      if (!mounted) return;
       setLoading(true);
       
       try {
         // Check API availability
         const apiAvailable = await healthCheck();
         
+        if (!mounted) return;
+        
         if (apiAvailable) {
           console.log('API available, fetching from server...');
           
           // Fetch featured article
           const featuredResult = await newsApi.getNews({ featured: true, limit: 1 });
-          if (featuredResult.data && featuredResult.data.length > 0) {
+          if (mounted && featuredResult.data && featuredResult.data.length > 0) {
             setFeaturedArticle(featuredResult.data[0]);
           }
           
           // Fetch all articles
           const articlesResult = await newsApi.getNews({ limit: 50 });
-          if (articlesResult.data && articlesResult.data.length > 0) {
-            setArticles(articlesResult.data);
-            // Extract unique categories
-            const uniqueCategories = [...new Set(articlesResult.data.map(article => article.category))];
-            setCategories(uniqueCategories);
-          } else {
-            // No articles from API - show empty state
-            setArticles([]);
-            setCategories([]);
+          if (mounted) {
+            if (articlesResult.data && articlesResult.data.length > 0) {
+              setArticles(articlesResult.data);
+              // Extract unique categories
+              const uniqueCategories = [...new Set(articlesResult.data.map(article => article.category))];
+              setCategories(uniqueCategories);
+            } else {
+              // No articles from API - show empty state
+              setArticles([]);
+              setCategories([]);
+            }
           }
         } else {
           console.log('API not available, using sample data...');
-          // API not available, use sample data for demonstration
-          setFeaturedArticle(sampleArticle.featured ? sampleArticle : null);
-          setArticles([sampleArticle]);
-          setCategories([sampleArticle.category]);
-          
-          toast.info(
-            language === 'en' 
-              ? 'Demo mode: Showing sample content. Add news through admin panel.'
-              : 'Жишээ горим: Жишээ мэдээлэл харуулж байна. Админ самбараар мэдээ нэмнэ үү.'
-          );
+          if (mounted) {
+            // API not available, use sample data for demonstration
+            setFeaturedArticle(sampleArticle.featured ? sampleArticle : null);
+            setArticles([sampleArticle]);
+            setCategories([sampleArticle.category]);
+            
+            toast.info(
+              language === 'en' 
+                ? 'Demo mode: Showing sample content. Add news through admin panel.'
+                : 'Жишээ горим: Жишээ мэдээлэл харуулж байна. Админ самбараар мэдээ нэмнэ үү.'
+            );
+          }
         }
         
       } catch (error) {
         console.error('Error fetching news:', error);
-        // Fallback to sample data on error
-        setFeaturedArticle(sampleArticle.featured ? sampleArticle : null);
-        setArticles([sampleArticle]);
-        setCategories([sampleArticle.category]);
-        
-        toast.warning(
-          language === 'en'
-            ? 'Connection error: Showing demo content.'
-            : 'Холболтын алдаа: Жишээ мэдээлэл харуулж байна.'
-        );
+        if (mounted) {
+          // Fallback to sample data on error
+          setFeaturedArticle(sampleArticle.featured ? sampleArticle : null);
+          setArticles([sampleArticle]);
+          setCategories([sampleArticle.category]);
+          
+          toast.warning(
+            language === 'en'
+              ? 'Connection error: Showing demo content.'
+              : 'Холболтын алдаа: Жишээ мэдээлэл харуулж байна.'
+          );
+        }
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
     
     fetchData();
+    
+    return () => {
+      mounted = false;
+    };
   }, [language]);
   
   // Filter and sort articles

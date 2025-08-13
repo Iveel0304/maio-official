@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 export interface ApiResponse<T> {
   data?: T;
@@ -24,7 +24,7 @@ export const newsApi = {
   async getNews(filters: NewsFilters = {}): Promise<ApiResponse<any[]>> {
     try {
       const queryParams = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           queryParams.append(key, value.toString());
@@ -32,21 +32,22 @@ export const newsApi = {
       });
 
       const response = await fetch(`${API_URL}/api/news?${queryParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return {
         data: result.articles,
-        pagination: result.pagination
+        pagination: result.pagination,
       };
     } catch (error) {
-      console.error('Error fetching news:', error);
+      console.error("Error fetching news:", error);
       return {
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
@@ -55,37 +56,41 @@ export const newsApi = {
   async getArticle(id: string): Promise<ApiResponse<any>> {
     try {
       const response = await fetch(`${API_URL}/api/news/${id}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Article not found');
+          throw new Error("Article not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const article = await response.json();
-      
+
       return { data: article };
     } catch (error) {
-      console.error('Error fetching article:', error);
+      console.error("Error fetching article:", error);
       return {
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
 
   // Create new article
-  async createArticle(articleData: any, imageFile?: File): Promise<ApiResponse<any>> {
+  async createArticle(
+    articleData: any,
+    imageFile?: File
+  ): Promise<ApiResponse<any>> {
     try {
       const formData = new FormData();
-      formData.append('data', JSON.stringify(articleData));
-      
+      formData.append("data", JSON.stringify(articleData));
+
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
       }
 
       const response = await fetch(`${API_URL}/api/news`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
 
@@ -94,45 +99,51 @@ export const newsApi = {
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error creating article:', error);
+      console.error("Error creating article:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to create article'
+        error:
+          error instanceof Error ? error.message : "Failed to create article",
       };
     }
   },
 
   // Update article
-  async updateArticle(id: string, articleData: any, imageFile?: File): Promise<ApiResponse<any>> {
+  async updateArticle(
+    id: string,
+    articleData: any,
+    imageFile?: File
+  ): Promise<ApiResponse<any>> {
     try {
       const formData = new FormData();
-      formData.append('data', JSON.stringify(articleData));
-      
+      formData.append("data", JSON.stringify(articleData));
+
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
       }
 
       const response = await fetch(`${API_URL}/api/news/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Article not found');
+          throw new Error("Article not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error updating article:', error);
+      console.error("Error updating article:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to update article'
+        error:
+          error instanceof Error ? error.message : "Failed to update article",
       };
     }
   },
@@ -141,21 +152,22 @@ export const newsApi = {
   async deleteArticle(id: string): Promise<ApiResponse<void>> {
     try {
       const response = await fetch(`${API_URL}/api/news/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Article not found');
+          throw new Error("Article not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       return {};
     } catch (error) {
-      console.error('Error deleting article:', error);
+      console.error("Error deleting article:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to delete article'
+        error:
+          error instanceof Error ? error.message : "Failed to delete article",
       };
     }
   },
@@ -164,29 +176,38 @@ export const newsApi = {
   async getCategories(): Promise<ApiResponse<string[]>> {
     try {
       const response = await fetch(`${API_URL}/api/news/categories`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const categories = await response.json();
-      
+
       return { data: categories };
     } catch (error) {
-      console.error('Error fetching categories:', error);
+      console.error("Error fetching categories:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to fetch categories'
+        error:
+          error instanceof Error ? error.message : "Failed to fetch categories",
       };
     }
-  }
+  },
 };
 
 // Events API functions
 export const eventsApi = {
-  async getEvents(filters: { page?: number; limit?: number; category?: string; search?: string; upcoming?: boolean } = {}): Promise<ApiResponse<any[]>> {
+  async getEvents(
+    filters: {
+      page?: number;
+      limit?: number;
+      category?: string;
+      search?: string;
+      upcoming?: boolean;
+    } = {}
+  ): Promise<ApiResponse<any[]>> {
     try {
       const queryParams = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           queryParams.append(key, value.toString());
@@ -194,21 +215,22 @@ export const eventsApi = {
       });
 
       const response = await fetch(`${API_URL}/api/events?${queryParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return {
         data: result.events,
-        pagination: result.pagination
+        pagination: result.pagination,
       };
     } catch (error) {
-      console.error('Error fetching events:', error);
+      console.error("Error fetching events:", error);
       return {
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
@@ -216,36 +238,40 @@ export const eventsApi = {
   async getEvent(id: string): Promise<ApiResponse<any>> {
     try {
       const response = await fetch(`${API_URL}/api/events/${id}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Event not found');
+          throw new Error("Event not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const event = await response.json();
-      
+
       return { data: event };
     } catch (error) {
-      console.error('Error fetching event:', error);
+      console.error("Error fetching event:", error);
       return {
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
 
-  async createEvent(eventData: any, imageFile?: File): Promise<ApiResponse<any>> {
+  async createEvent(
+    eventData: any,
+    imageFile?: File
+  ): Promise<ApiResponse<any>> {
     try {
       const formData = new FormData();
-      formData.append('data', JSON.stringify(eventData));
-      
+      formData.append("data", JSON.stringify(eventData));
+
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
       }
 
       const response = await fetch(`${API_URL}/api/events`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
 
@@ -254,44 +280,50 @@ export const eventsApi = {
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error creating event:', error);
+      console.error("Error creating event:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to create event'
+        error:
+          error instanceof Error ? error.message : "Failed to create event",
       };
     }
   },
 
-  async updateEvent(id: string, eventData: any, imageFile?: File): Promise<ApiResponse<any>> {
+  async updateEvent(
+    id: string,
+    eventData: any,
+    imageFile?: File
+  ): Promise<ApiResponse<any>> {
     try {
       const formData = new FormData();
-      formData.append('data', JSON.stringify(eventData));
-      
+      formData.append("data", JSON.stringify(eventData));
+
       if (imageFile) {
-        formData.append('image', imageFile);
+        formData.append("image", imageFile);
       }
 
       const response = await fetch(`${API_URL}/api/events/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Event not found');
+          throw new Error("Event not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error updating event:', error);
+      console.error("Error updating event:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to update event'
+        error:
+          error instanceof Error ? error.message : "Failed to update event",
       };
     }
   },
@@ -299,32 +331,40 @@ export const eventsApi = {
   async deleteEvent(id: string): Promise<ApiResponse<void>> {
     try {
       const response = await fetch(`${API_URL}/api/events/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Event not found');
+          throw new Error("Event not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       return {};
     } catch (error) {
-      console.error('Error deleting event:', error);
+      console.error("Error deleting event:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to delete event'
+        error:
+          error instanceof Error ? error.message : "Failed to delete event",
       };
     }
-  }
+  },
 };
 
 // Media API functions
 export const mediaApi = {
-  async getMedia(filters: { page?: number; limit?: number; type?: string; search?: string } = {}): Promise<ApiResponse<any[]>> {
+  async getMedia(
+    filters: {
+      page?: number;
+      limit?: number;
+      type?: string;
+      search?: string;
+    } = {}
+  ): Promise<ApiResponse<any[]>> {
     try {
       const queryParams = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           queryParams.append(key, value.toString());
@@ -332,36 +372,45 @@ export const mediaApi = {
       });
 
       const response = await fetch(`${API_URL}/api/media?${queryParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return {
         data: result.mediaItems,
-        pagination: result.pagination
+        pagination: result.pagination,
       };
     } catch (error) {
-      console.error('Error fetching media:', error);
+      console.error("Error fetching media:", error);
       return {
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
 
-  async uploadMedia(data: { title: string; description?: string; tags?: string[]; category?: string }, file: File): Promise<ApiResponse<any>> {
+  async uploadMedia(
+    data: {
+      title: string;
+      description?: string;
+      tags?: string[];
+      category?: string;
+    },
+    file: File
+  ): Promise<ApiResponse<any>> {
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      formData.append('title', data.title);
-      if (data.description) formData.append('description', data.description);
-      if (data.tags) formData.append('tags', JSON.stringify(data.tags));
-      if (data.category) formData.append('category', data.category);
+      formData.append("file", file);
+      formData.append("title", data.title);
+      if (data.description) formData.append("description", data.description);
+      if (data.tags) formData.append("tags", JSON.stringify(data.tags));
+      if (data.category) formData.append("category", data.category);
 
       const response = await fetch(`${API_URL}/api/media`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
 
@@ -370,12 +419,13 @@ export const mediaApi = {
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error uploading media:', error);
+      console.error("Error uploading media:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to upload media'
+        error:
+          error instanceof Error ? error.message : "Failed to upload media",
       };
     }
   },
@@ -383,32 +433,41 @@ export const mediaApi = {
   async deleteMedia(id: string): Promise<ApiResponse<void>> {
     try {
       const response = await fetch(`${API_URL}/api/media/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Media not found');
+          throw new Error("Media not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       return {};
     } catch (error) {
-      console.error('Error deleting media:', error);
+      console.error("Error deleting media:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to delete media'
+        error:
+          error instanceof Error ? error.message : "Failed to delete media",
       };
     }
-  }
+  },
 };
 
 // Results API functions
 export const resultsApi = {
-  async getResults(filters: { page?: number; limit?: number; category?: string; year?: number; search?: string } = {}): Promise<ApiResponse<any[]>> {
+  async getResults(
+    filters: {
+      page?: number;
+      limit?: number;
+      category?: string;
+      year?: number;
+      search?: string;
+    } = {}
+  ): Promise<ApiResponse<any[]>> {
     try {
       const queryParams = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           queryParams.append(key, value.toString());
@@ -416,21 +475,22 @@ export const resultsApi = {
       });
 
       const response = await fetch(`${API_URL}/api/results?${queryParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return {
         data: result.results,
-        pagination: result.pagination
+        pagination: result.pagination,
       };
     } catch (error) {
-      console.error('Error fetching results:', error);
+      console.error("Error fetching results:", error);
       return {
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
@@ -438,9 +498,9 @@ export const resultsApi = {
   async createResult(data: any): Promise<ApiResponse<any>> {
     try {
       const response = await fetch(`${API_URL}/api/results`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
@@ -450,12 +510,13 @@ export const resultsApi = {
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error creating result:', error);
+      console.error("Error creating result:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to create result'
+        error:
+          error instanceof Error ? error.message : "Failed to create result",
       };
     }
   },
@@ -463,27 +524,28 @@ export const resultsApi = {
   async updateResult(id: string, data: any): Promise<ApiResponse<any>> {
     try {
       const response = await fetch(`${API_URL}/api/results/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Result not found');
+          throw new Error("Result not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error updating result:', error);
+      console.error("Error updating result:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to update result'
+        error:
+          error instanceof Error ? error.message : "Failed to update result",
       };
     }
   },
@@ -491,24 +553,25 @@ export const resultsApi = {
   async deleteResult(id: string): Promise<ApiResponse<void>> {
     try {
       const response = await fetch(`${API_URL}/api/results/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Result not found');
+          throw new Error("Result not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       return {};
     } catch (error) {
-      console.error('Error deleting result:', error);
+      console.error("Error deleting result:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to delete result'
+        error:
+          error instanceof Error ? error.message : "Failed to delete result",
       };
     }
-  }
+  },
 };
 
 // Sponsors API functions
@@ -516,21 +579,22 @@ export const sponsorsApi = {
   async getSponsors(activeOnly = false): Promise<ApiResponse<any[]>> {
     try {
       const queryParams = new URLSearchParams();
-      if (activeOnly) queryParams.append('active', 'true');
+      if (activeOnly) queryParams.append("active", "true");
 
       const response = await fetch(`${API_URL}/api/sponsors?${queryParams}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error fetching sponsors:', error);
+      console.error("Error fetching sponsors:", error);
       return {
-        error: error instanceof Error ? error.message : 'Unknown error occurred'
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       };
     }
   },
@@ -541,7 +605,7 @@ export const sponsorsApi = {
       const response = await this.getSponsors(true);
       return response.data || [];
     } catch (error) {
-      console.error('Error fetching all sponsors:', error);
+      console.error("Error fetching all sponsors:", error);
       return [];
     }
   },
@@ -549,14 +613,14 @@ export const sponsorsApi = {
   async createSponsor(data: any, logoFile?: File): Promise<ApiResponse<any>> {
     try {
       const formData = new FormData();
-      formData.append('data', JSON.stringify(data));
-      
+      formData.append("data", JSON.stringify(data));
+
       if (logoFile) {
-        formData.append('logo', logoFile);
+        formData.append("logo", logoFile);
       }
 
       const response = await fetch(`${API_URL}/api/sponsors`, {
-        method: 'POST',
+        method: "POST",
         body: formData,
       });
 
@@ -565,44 +629,50 @@ export const sponsorsApi = {
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error creating sponsor:', error);
+      console.error("Error creating sponsor:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to create sponsor'
+        error:
+          error instanceof Error ? error.message : "Failed to create sponsor",
       };
     }
   },
 
-  async updateSponsor(id: string, data: any, logoFile?: File): Promise<ApiResponse<any>> {
+  async updateSponsor(
+    id: string,
+    data: any,
+    logoFile?: File
+  ): Promise<ApiResponse<any>> {
     try {
       const formData = new FormData();
-      formData.append('data', JSON.stringify(data));
-      
+      formData.append("data", JSON.stringify(data));
+
       if (logoFile) {
-        formData.append('logo', logoFile);
+        formData.append("logo", logoFile);
       }
 
       const response = await fetch(`${API_URL}/api/sponsors/${id}`, {
-        method: 'PUT',
+        method: "PUT",
         body: formData,
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Sponsor not found');
+          throw new Error("Sponsor not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      
+
       return { data: result };
     } catch (error) {
-      console.error('Error updating sponsor:', error);
+      console.error("Error updating sponsor:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to update sponsor'
+        error:
+          error instanceof Error ? error.message : "Failed to update sponsor",
       };
     }
   },
@@ -610,24 +680,25 @@ export const sponsorsApi = {
   async deleteSponsor(id: string): Promise<ApiResponse<void>> {
     try {
       const response = await fetch(`${API_URL}/api/sponsors/${id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (!response.ok) {
         if (response.status === 404) {
-          throw new Error('Sponsor not found');
+          throw new Error("Sponsor not found");
         }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       return {};
     } catch (error) {
-      console.error('Error deleting sponsor:', error);
+      console.error("Error deleting sponsor:", error);
       return {
-        error: error instanceof Error ? error.message : 'Failed to delete sponsor'
+        error:
+          error instanceof Error ? error.message : "Failed to delete sponsor",
       };
     }
-  }
+  },
 };
 
 // Health check
@@ -636,7 +707,7 @@ export const healthCheck = async (): Promise<boolean> => {
     const response = await fetch(`${API_URL}/api/health`);
     return response.ok;
   } catch (error) {
-    console.error('Health check failed:', error);
+    console.error("Health check failed:", error);
     return false;
   }
 };
