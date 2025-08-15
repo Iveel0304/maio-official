@@ -60,26 +60,73 @@ import { format } from 'date-fns';
 
 interface Article {
   _id?: string;
+  id?: string;
   title: {
     en: string;
     mn: string;
   };
+  title_en?: string;
+  title_mn?: string;
   content: {
     en: string;
     mn: string;
   };
+  content_en?: string;
+  content_mn?: string;
   summary: {
     en: string;
     mn: string;
   };
+  summary_en?: string;
+  summary_mn?: string;
   category: string;
   author: string;
   publishDate: string;
+  publish_date?: string;
   updatedDate?: string;
+  updated_at?: string;
   imageUrl?: string;
+  image_url?: string;
   tags: string[];
   featured?: boolean;
 }
+
+// Transform server data to match component interface
+const transformArticle = (serverArticle: any): Article => {
+  return {
+    _id: serverArticle.id || serverArticle._id,
+    id: serverArticle.id || serverArticle._id,
+    title: {
+      en: serverArticle.title_en || serverArticle.title?.en || '',
+      mn: serverArticle.title_mn || serverArticle.title?.mn || ''
+    },
+    content: {
+      en: serverArticle.content_en || serverArticle.content?.en || '',
+      mn: serverArticle.content_mn || serverArticle.content?.mn || ''
+    },
+    summary: {
+      en: serverArticle.summary_en || serverArticle.summary?.en || '',
+      mn: serverArticle.summary_mn || serverArticle.summary?.mn || ''
+    },
+    category: serverArticle.category || 'news',
+    author: serverArticle.author || '',
+    publishDate: serverArticle.publish_date || serverArticle.publishDate || new Date().toISOString().split('T')[0],
+    updatedDate: serverArticle.updated_at || serverArticle.updatedDate,
+    imageUrl: serverArticle.image_url || serverArticle.imageUrl,
+    tags: serverArticle.tags || [],
+    featured: serverArticle.featured || false,
+    // Keep original server fields for backwards compatibility
+    title_en: serverArticle.title_en,
+    title_mn: serverArticle.title_mn,
+    content_en: serverArticle.content_en,
+    content_mn: serverArticle.content_mn,
+    summary_en: serverArticle.summary_en,
+    summary_mn: serverArticle.summary_mn,
+    publish_date: serverArticle.publish_date,
+    updated_at: serverArticle.updated_at,
+    image_url: serverArticle.image_url
+  };
+};
 
 export default function NewsManager() {
   const { language } = useLanguage();
@@ -101,7 +148,7 @@ export default function NewsManager() {
     title: { en: '', mn: '' },
     content: { en: '', mn: '' },
     summary: { en: '', mn: '' },
-    category: '',
+    category: 'announcement',
     author: '',
     publishDate: new Date().toISOString().split('T')[0],
     tags: [],
@@ -125,7 +172,9 @@ export default function NewsManager() {
     if (result.error) {
       toast.error(result.error);
     } else {
-      setArticles(result.data || []);
+      // Transform server data to match component interface
+      const transformedArticles = (result.data || []).map(transformArticle);
+      setArticles(transformedArticles);
       setPagination(result.pagination || { current: 1, pages: 1, total: 0 });
     }
     setLoading(false);
@@ -135,7 +184,9 @@ export default function NewsManager() {
   const loadCategories = async () => {
     const result = await newsApi.getCategories();
     if (result.data) {
-      setCategories(result.data);
+      // Filter out any empty string categories
+      const validCategories = result.data.filter(category => category && category.trim() !== '');
+      setCategories(validCategories);
     }
   };
 
@@ -191,7 +242,7 @@ export default function NewsManager() {
       title: { en: '', mn: '' },
       content: { en: '', mn: '' },
       summary: { en: '', mn: '' },
-      category: '',
+      category: 'announcement',
       author: '',
       publishDate: new Date().toISOString().split('T')[0],
       tags: [],
@@ -262,7 +313,9 @@ export default function NewsManager() {
                   <SelectItem value="all">
                     {language === 'en' ? 'All Categories' : 'Бүх ангилал'}
                   </SelectItem>
-                  {categories.map(category => (
+                  {categories
+                    .filter(category => category && category.trim() !== '')
+                    .map(category => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
@@ -295,81 +348,88 @@ export default function NewsManager() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {articles.map((article) => (
-                  <TableRow key={article._id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{article.title[language]}</p>
-                        <p className="text-sm text-muted-foreground line-clamp-1">
-                          {article.summary[language]}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary">{article.category}</Badge>
-                    </TableCell>
-                    <TableCell>{article.author}</TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <p>{format(new Date(article.publishDate), 'PPP')}</p>
-                        {article.updatedDate && (
-                          <p className="text-muted-foreground">
-                            Updated: {format(new Date(article.updatedDate), 'PP')}
+                {articles.map((article) => {
+                  // Safe fallbacks for title and summary
+                  const safeTitle = article.title || { en: 'Untitled Article', mn: 'Гарчиггүй нийтлэл' };
+                  const safeSummary = article.summary || { en: 'No summary available', mn: 'Товч агуулга байхгүй' };
+                  const safeDate = article.publishDate || article.publish_date || new Date().toISOString();
+                  
+                  return (
+                    <TableRow key={article._id || article.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium">{safeTitle[language] || safeTitle.en || 'Untitled'}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-1">
+                            {safeSummary[language] || safeSummary.en || 'No summary'}
                           </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="secondary">{article.category}</Badge>
+                      </TableCell>
+                      <TableCell>{article.author}</TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <p>{format(new Date(safeDate), 'PPP')}</p>
+                          {(article.updatedDate || article.updated_at) && (
+                            <p className="text-muted-foreground">
+                              Updated: {format(new Date(article.updatedDate || article.updated_at), 'PP')}
+                            </p>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {article.featured && (
+                          <Badge variant="default" className="flex items-center gap-1 w-fit">
+                            <Star className="h-3 w-3" />
+                            Featured
+                          </Badge>
                         )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {article.featured && (
-                        <Badge variant="default" className="flex items-center gap-1 w-fit">
-                          <Star className="h-3 w-3" />
-                          Featured
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => openEditor(article)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>
-                                {language === 'en' ? 'Delete Article' : 'Мэдээ устгах'}
-                              </AlertDialogTitle>
-                              <AlertDialogDescription>
-                                {language === 'en' 
-                                  ? 'Are you sure you want to delete this article? This action cannot be undone.'
-                                  : 'Та энэ мэдээг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.'}
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>
-                                {language === 'en' ? 'Cancel' : 'Цуцлах'}
-                              </AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => article._id && handleDelete(article._id)}
-                                className="bg-destructive text-destructive-foreground"
-                              >
-                                {language === 'en' ? 'Delete' : 'Устгах'}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => openEditor(article)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  {language === 'en' ? 'Delete Article' : 'Мэдээ устгах'}
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  {language === 'en' 
+                                    ? 'Are you sure you want to delete this article? This action cannot be undone.'
+                                    : 'Та энэ мэдээг устгахдаа итгэлтэй байна уу? Энэ үйлдлийг буцаах боломжгүй.'}
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>
+                                  {language === 'en' ? 'Cancel' : 'Цуцлах'}
+                                </AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => (article._id || article.id) && handleDelete(article._id || article.id!)}
+                                  className="bg-destructive text-destructive-foreground"
+                                >
+                                  {language === 'en' ? 'Delete' : 'Устгах'}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>

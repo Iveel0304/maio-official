@@ -4,6 +4,8 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { CalendarDays, Clock, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import ErrorBoundary from '@/components/ui/ErrorBoundary';
+import { validateEvent, safeTranslate } from '@/lib/translationValidator';
 
 interface EventCardProps {
   event: Event;
@@ -12,8 +14,22 @@ interface EventCardProps {
 const EventCard = ({ event }: EventCardProps) => {
   const { language, t } = useLanguage();
   
-  // Format date based on language
-  const formattedDate = format(new Date(event.date), 'PPP');
+  // Format date based on language with error handling
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      // Check if the date is valid
+      if (isNaN(date.getTime()) || dateString.includes('00-00')) {
+        return language === 'en' ? 'Date TBA' : 'Огноо тодорхойгүй';
+      }
+      return format(date, 'PPP');
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return language === 'en' ? 'Date TBA' : 'Огноо тодорхойгүй';
+    }
+  };
+  
+  const formattedDate = formatDate(event.date);
   
   return (
     <Card className="overflow-hidden h-full flex flex-col">
@@ -69,4 +85,12 @@ const EventCard = ({ event }: EventCardProps) => {
   );
 };
 
-export default EventCard;
+const EventCardWithErrorBoundary = (props: EventCardProps) => (
+  <ErrorBoundary>
+    <EventCard {...props} />
+  </ErrorBoundary>
+);
+
+EventCardWithErrorBoundary.displayName = 'EventCard';
+
+export default EventCardWithErrorBoundary;

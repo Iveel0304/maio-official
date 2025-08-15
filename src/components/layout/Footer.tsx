@@ -1,7 +1,14 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Facebook, Instagram, Twitter, Youtube, Github, ExternalLink } from "lucide-react";
+import {
+  Facebook,
+  Instagram,
+  Twitter,
+  Youtube,
+  Github,
+  ExternalLink,
+} from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { sponsorsApi } from "@/lib/api";
 
@@ -12,7 +19,7 @@ interface Sponsor {
   logo?: string;
   logoUrl?: string;
   website: string;
-  tier: 'platinum' | 'gold' | 'silver' | 'bronze';
+  tier: "platinum" | "gold" | "silver" | "bronze";
   featured?: boolean;
   active?: boolean;
   description?: {
@@ -32,7 +39,7 @@ const Footer = () => {
         const data = await sponsorsApi.getAll();
         setSponsors(data);
       } catch (error) {
-        console.error('Failed to load sponsors:', error);
+        console.error("Failed to load sponsors:", error);
       } finally {
         setIsLoadingSponsors(false);
       }
@@ -163,82 +170,6 @@ const Footer = () => {
             </ul>
           </div>
         </div>
-
-        {/* Sponsors Section */}
-        {!isLoadingSponsors && sponsors.length > 0 && (
-          <div className="mt-12 pt-8 border-t">
-            <h3 className="font-medium text-lg mb-6 text-center">
-              {language === "en" ? "Our Sponsors" : "Бидний ивээн тэтгэгчид"}
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center">
-              {sponsors
-                .filter(sponsor => sponsor.featured)
-                .sort((a, b) => {
-                  const tierOrder = { organizer: 0, platinum: 1, gold: 2, main: 2, silver: 3, sponsor: 3, bronze: 4, supporter: 4 };
-                  return (tierOrder[a.tier] || 5) - (tierOrder[b.tier] || 5);
-                })
-                .map((sponsor) => {
-                  const sponsorId = sponsor._id || sponsor.id;
-                  return (
-                    <motion.a
-                      key={sponsorId}
-                      href={sponsor.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center justify-center p-3 rounded-lg border hover:border-primary/50 hover:shadow-md transition-all duration-300 bg-card"
-                      whileHover={{ scale: 1.05, y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                      title={`${sponsor.name} - ${language === "en" ? "Visit website" : "Веб хуудас руу очих"}`}
-                    >
-                      <div className="relative w-full h-12 flex items-center justify-center">
-                        <img
-                          src={sponsor.logoUrl || sponsor.logo || '/images/placeholder.jpg'}
-                          alt={sponsor.name}
-                          className="max-w-full max-h-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                          loading="lazy"
-                        />
-                        <ExternalLink className="absolute top-1 right-1 h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
-                      </div>
-                    </motion.a>
-                  );
-                })}
-            </div>
-            {sponsors.filter(sponsor => !sponsor.featured).length > 0 && (
-              <div className="mt-6">
-                <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-8 gap-4 items-center">
-                  {sponsors
-                    .filter(sponsor => !sponsor.featured)
-                    .sort((a, b) => {
-                      const tierOrder = { organizer: 0, platinum: 1, gold: 2, main: 2, silver: 3, sponsor: 3, bronze: 4, supporter: 4 };
-                      return (tierOrder[a.tier] || 5) - (tierOrder[b.tier] || 5);
-                    })
-                    .map((sponsor) => {
-                      const sponsorId = sponsor._id || sponsor.id;
-                      return (
-                        <motion.a
-                          key={sponsorId}
-                          href={sponsor.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="group flex items-center justify-center p-2 rounded border hover:border-primary/30 transition-all duration-300"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          title={`${sponsor.name} - ${language === "en" ? "Visit website" : "Веб хуудас руу очих"}`}
-                        >
-                          <img
-                            src={sponsor.logoUrl || sponsor.logo || '/images/placeholder.jpg'}
-                            alt={sponsor.name}
-                            className="max-w-full h-8 object-contain filter grayscale hover:grayscale-0 transition-all duration-300"
-                            loading="lazy"
-                          />
-                        </motion.a>
-                      );
-                    })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Copyright */}
         <div className="mt-12 pt-6 border-t text-center text-sm text-muted-foreground">

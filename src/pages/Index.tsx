@@ -261,8 +261,8 @@ export default function HomePage() {
             <Bell className="h-4 w-4 animate-pulse" />
             <span>
               {language === "en"
-                ? "🔥 MAIO 2025 Registration will start soon. - Don't miss out!"
-                : "🔥 MAIO 2025 Бүртгэл эхлэхэд тун удахгүй - Бүү алдаарай!"}
+                ? "🔥 MAIO 2026 Registration will start soon. - Don't miss out!"
+                : "🔥 MAIO 2026 Бүртгэл эхлэхэд тун удахгүй - Бүү алдаарай!"}
             </span>
           </div>
         </div>

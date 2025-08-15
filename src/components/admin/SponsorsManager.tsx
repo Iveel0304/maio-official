@@ -35,7 +35,7 @@ import { sponsorsApi } from "@/lib/api";
 import { toast } from "sonner";
 
 interface Sponsor {
-  _id?: string;
+  id?: string;
   name: string;
   description: string;
   website?: string;
@@ -47,7 +47,7 @@ interface Sponsor {
   updatedAt?: string;
 }
 
-const initialSponsor: Omit<Sponsor, "_id"> = {
+const initialSponsor: Omit<Sponsor, "id"> = {
   name: "",
   description: "",
   website: "",
@@ -85,7 +85,7 @@ export default function SponsorsManager() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] =
-    useState<Omit<Sponsor, "_id">>(initialSponsor);
+    useState<Omit<Sponsor, "id">>(initialSponsor);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -150,7 +150,7 @@ export default function SponsorsManager() {
   };
 
   const handleEdit = (sponsor: Sponsor) => {
-    setEditingId(sponsor._id!);
+    setEditingId(sponsor.id!);
     setFormData({
       name: sponsor.name,
       description: sponsor.description,
@@ -376,7 +376,7 @@ export default function SponsorsManager() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sponsors.map((sponsor) => (
             <Card
-              key={sponsor._id}
+              key={sponsor.id}
               className={`relative ${!sponsor.active ? "opacity-60" : ""}`}
             >
               <CardContent className="p-6">
@@ -442,7 +442,7 @@ export default function SponsorsManager() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => handleDelete(sponsor._id!)}
+                    onClick={() => handleDelete(sponsor.id!)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

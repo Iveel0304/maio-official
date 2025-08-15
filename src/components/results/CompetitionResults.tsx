@@ -45,10 +45,10 @@ const CompetitionResults = ({ competitions }: CompetitionResultsProps) => {
                     {language === 'en' ? 'Rank' : 'Байр'}
                   </TableHead>
                   <TableHead>
-                    {language === 'en' ? 'Team' : 'Баг'}
+                    {language === 'en' ? 'Last Name' : 'Овог нэр'}
                   </TableHead>
                   <TableHead>
-                    {language === 'en' ? 'Members' : 'Гишүүд'}
+                    {language === 'en' ? 'School' : 'Сургууль'}
                   </TableHead>
                   <TableHead className="text-right">
                     {language === 'en' ? 'Score' : 'Оноо'}
@@ -65,7 +65,7 @@ const CompetitionResults = ({ competitions }: CompetitionResultsProps) => {
                       </div>
                     </TableCell>
                     <TableCell>{ranking.team}</TableCell>
-                    <TableCell>{ranking.members.join(', ')}</TableCell>
+                    <TableCell>{ranking.school || ranking.members.join(', ')}</TableCell>
                     <TableCell className="text-right">{ranking.score}</TableCell>
                   </TableRow>
                 ))}

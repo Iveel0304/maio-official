@@ -14,13 +14,15 @@ const Layout = ({ children, className = '' }: LayoutProps) => {
     <div className="flex min-h-screen flex-col">
       <Header />
       <motion.main 
-        className={`flex-1 ${className}`}
+        className={`flex-1 flex items-center justify-center ${className}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {children}
+        <div className="w-full">
+          {children}
+        </div>
       </motion.main>
       <Footer />
       <Toaster />

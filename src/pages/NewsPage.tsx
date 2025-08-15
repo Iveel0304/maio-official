@@ -30,7 +30,7 @@ export default function NewsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("latest");
   const [viewMode, setViewMode] = useState("grid"); // grid or list
 
@@ -187,28 +187,25 @@ export default function NewsPage() {
           .includes(searchQuery.toLowerCase());
 
       const matchesCategory =
-        selectedCategory === "" ||
         selectedCategory === "all" ||
         article.category === selectedCategory;
 
-      return (
-        matchesSearch && matchesCategory && article._id !== featuredArticle?._id
-      );
+      return matchesSearch && matchesCategory;
     })
     .sort((a, b) => {
       if (sortBy === "latest") {
         return (
-          new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+          new Date(b.publish_date || b.publishDate).getTime() - new Date(a.publish_date || a.publishDate).getTime()
         );
       } else if (sortBy === "oldest") {
         return (
-          new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime()
+          new Date(a.publish_date || a.publishDate).getTime() - new Date(b.publish_date || b.publishDate).getTime()
         );
       } else if (sortBy === "popular") {
         // Sort by a combination of featured status and date for popularity
         return (
           (b.featured ? 1 : 0) - (a.featured ? 1 : 0) ||
-          new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime()
+          new Date(b.publish_date || b.publishDate).getTime() - new Date(a.publish_date || a.publishDate).getTime()
         );
       }
       return 0;
@@ -254,41 +251,6 @@ export default function NewsPage() {
             </div>
           </div>
 
-          {/* Featured Article Section */}
-          {featuredArticle && (
-            <section
-              className="bg-gradient-to-br from-muted/50 to-muted/30 py-16 relative"
-              ref={featuredRef}
-            >
-              <div className="container mx-auto px-4">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={featuredInView ? { opacity: 1, y: 0 } : {}}
-                  transition={{ duration: 0.6 }}
-                >
-                  <div className="flex items-center gap-2 mb-8 justify-center">
-                    <Star className="h-6 w-6 text-primary" />
-                    <h2 className="text-2xl md:text-3xl font-bold text-center">
-                      {language === "en" ? "Featured Story" : "Онцлох мэдээ"}
-                    </h2>
-                    <Badge variant="secondary" className="ml-2">
-                      <Flame className="w-3 h-3 mr-1" />
-                      {language === "en" ? "Hot" : "Халуун"}
-                    </Badge>
-                  </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={featuredInView ? { opacity: 1, scale: 1 } : {}}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                    whileHover={{ y: -5 }}
-                  >
-                    <FeaturedArticle article={featuredArticle} />
-                  </motion.div>
-                </motion.div>
-              </div>
-            </section>
-          )}
 
           {/* News Content Section */}
           <div className="container mx-auto px-4 py-12">
@@ -444,7 +406,7 @@ export default function NewsPage() {
                     variant="outline"
                     onClick={() => {
                       setSearchQuery("");
-                      setSelectedCategory("");
+                      setSelectedCategory("all");
                     }}
                   >
                     {language === "en" ? "Reset Filters" : "Шүүлтүүр сэргээх"}

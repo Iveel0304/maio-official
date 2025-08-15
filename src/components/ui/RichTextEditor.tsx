@@ -1,14 +1,14 @@
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import LinkExtension from '@tiptap/extension-link';
-import ImageExtension from '@tiptap/extension-image';
-import UnderlineExtension from '@tiptap/extension-underline';
-import TableExtension from '@tiptap/extension-table';
-import TableRowExtension from '@tiptap/extension-table-row';
-import TableHeaderExtension from '@tiptap/extension-table-header';
-import TableCellExtension from '@tiptap/extension-table-cell';
-import { Button } from './button';
-import { Separator } from './separator';
+import { useEditor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import LinkExtension from "@tiptap/extension-link";
+import ImageExtension from "@tiptap/extension-image";
+import UnderlineExtension from "@tiptap/extension-underline";
+import TableExtension from "@tiptap/extension-table";
+import TableRowExtension from "@tiptap/extension-table-row";
+import TableHeaderExtension from "@tiptap/extension-table-header";
+import TableCellExtension from "@tiptap/extension-table-cell";
+import { Button } from "./button";
+import { Separator } from "./separator";
 import {
   Bold,
   Italic,
@@ -26,13 +26,16 @@ import {
   Link as LinkIcon,
   Image as ImageIcon,
   Table as TableIcon,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-} from 'lucide-react';
-import { useCallback, useState } from 'react';
-import { Input } from './input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './dialog';
+} from "lucide-react";
+import { useCallback, useState, useRef, useEffect } from "react";
+import { Input } from "./input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./dialog";
 
 interface RichTextEditorProps {
   content: string;
@@ -41,16 +44,17 @@ interface RichTextEditorProps {
   className?: string;
 }
 
-const RichTextEditor = ({ 
-  content, 
-  onChange, 
-  placeholder = "Start writing...", 
-  className = "" 
+const RichTextEditor = ({
+  content,
+  onChange,
+  placeholder = "Start writing...",
+  className = "",
 }: RichTextEditorProps) => {
-  const [linkUrl, setLinkUrl] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [linkUrl, setLinkUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false);
   const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
+  const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -59,7 +63,7 @@ const RichTextEditor = ({
       LinkExtension.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-primary underline cursor-pointer',
+          class: "text-primary underline cursor-pointer",
         },
       }),
       ImageExtension,
@@ -72,19 +76,26 @@ const RichTextEditor = ({
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const html = editor.getHTML();
+      onChange(html);
     },
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[300px] p-4',
+        class:
+          "prose prose-sm sm:prose lg:prose-lg xl:prose-2xl mx-auto focus:outline-none min-h-[300px] p-4",
       },
     },
   });
 
   const addLink = useCallback(() => {
     if (linkUrl && editor) {
-      editor.chain().focus().extendMarkRange('link').setLink({ href: linkUrl }).run();
-      setLinkUrl('');
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: linkUrl })
+        .run();
+      setLinkUrl("");
       setIsLinkDialogOpen(false);
     }
   }, [editor, linkUrl]);
@@ -92,14 +103,18 @@ const RichTextEditor = ({
   const addImage = useCallback(() => {
     if (imageUrl && editor) {
       editor.chain().focus().setImage({ src: imageUrl }).run();
-      setImageUrl('');
+      setImageUrl("");
       setIsImageDialogOpen(false);
     }
   }, [editor, imageUrl]);
 
   const addTable = useCallback(() => {
     if (editor) {
-      editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+      editor
+        .chain()
+        .focus()
+        .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+        .run();
     }
   }, [editor]);
 
@@ -113,43 +128,43 @@ const RichTextEditor = ({
       <div className="border-b border-border p-2 flex flex-wrap items-center gap-1">
         {/* Text formatting */}
         <Button
-          variant={editor.isActive('bold') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("bold") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
         >
           <Bold className="h-4 w-4" />
         </Button>
-        
+
         <Button
-          variant={editor.isActive('italic') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("italic") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleItalic().run()}
           disabled={!editor.can().chain().focus().toggleItalic().run()}
         >
           <Italic className="h-4 w-4" />
         </Button>
-        
+
         <Button
-          variant={editor.isActive('underline') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("underline") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           disabled={!editor.can().chain().focus().toggleUnderline().run()}
         >
           <UnderlineIcon className="h-4 w-4" />
         </Button>
-        
+
         <Button
-          variant={editor.isActive('strike') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("strike") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleStrike().run()}
           disabled={!editor.can().chain().focus().toggleStrike().run()}
         >
           <Strikethrough className="h-4 w-4" />
         </Button>
-        
+
         <Button
-          variant={editor.isActive('code') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("code") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleCode().run()}
           disabled={!editor.can().chain().focus().toggleCode().run()}
@@ -161,25 +176,37 @@ const RichTextEditor = ({
 
         {/* Headings */}
         <Button
-          variant={editor.isActive('heading', { level: 1 }) ? 'secondary' : 'ghost'}
+          variant={
+            editor.isActive("heading", { level: 1 }) ? "secondary" : "ghost"
+          }
           size="sm"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 1 }).run()
+          }
         >
           <Heading1 className="h-4 w-4" />
         </Button>
-        
+
         <Button
-          variant={editor.isActive('heading', { level: 2 }) ? 'secondary' : 'ghost'}
+          variant={
+            editor.isActive("heading", { level: 2 }) ? "secondary" : "ghost"
+          }
           size="sm"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 2 }).run()
+          }
         >
           <Heading2 className="h-4 w-4" />
         </Button>
-        
+
         <Button
-          variant={editor.isActive('heading', { level: 3 }) ? 'secondary' : 'ghost'}
+          variant={
+            editor.isActive("heading", { level: 3 }) ? "secondary" : "ghost"
+          }
           size="sm"
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+          onClick={() =>
+            editor.chain().focus().toggleHeading({ level: 3 }).run()
+          }
         >
           <Heading3 className="h-4 w-4" />
         </Button>
@@ -188,15 +215,15 @@ const RichTextEditor = ({
 
         {/* Lists */}
         <Button
-          variant={editor.isActive('bulletList') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("bulletList") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
         >
           <List className="h-4 w-4" />
         </Button>
-        
+
         <Button
-          variant={editor.isActive('orderedList') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("orderedList") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
         >
@@ -207,7 +234,7 @@ const RichTextEditor = ({
 
         {/* Quote */}
         <Button
-          variant={editor.isActive('blockquote') ? 'secondary' : 'ghost'}
+          variant={editor.isActive("blockquote") ? "secondary" : "ghost"}
           size="sm"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
         >
@@ -220,7 +247,7 @@ const RichTextEditor = ({
         <Dialog open={isLinkDialogOpen} onOpenChange={setIsLinkDialogOpen}>
           <DialogTrigger asChild>
             <Button
-              variant={editor.isActive('link') ? 'secondary' : 'ghost'}
+              variant={editor.isActive("link") ? "secondary" : "ghost"}
               size="sm"
             >
               <LinkIcon className="h-4 w-4" />
@@ -235,10 +262,13 @@ const RichTextEditor = ({
                 placeholder="Enter URL"
                 value={linkUrl}
                 onChange={(e) => setLinkUrl(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addLink()}
+                onKeyDown={(e) => e.key === "Enter" && addLink()}
               />
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsLinkDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsLinkDialogOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button onClick={addLink}>Add Link</Button>
@@ -263,10 +293,13 @@ const RichTextEditor = ({
                 placeholder="Enter image URL"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addImage()}
+                onKeyDown={(e) => e.key === "Enter" && addImage()}
               />
               <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setIsImageDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsImageDialogOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button onClick={addImage}>Add Image</Button>
@@ -276,11 +309,7 @@ const RichTextEditor = ({
         </Dialog>
 
         {/* Table */}
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={addTable}
-        >
+        <Button variant="ghost" size="sm" onClick={addTable}>
           <TableIcon className="h-4 w-4" />
         </Button>
 
@@ -295,7 +324,7 @@ const RichTextEditor = ({
         >
           <Undo className="h-4 w-4" />
         </Button>
-        
+
         <Button
           variant="ghost"
           size="sm"
@@ -308,8 +337,8 @@ const RichTextEditor = ({
 
       {/* Editor */}
       <div className="min-h-[300px]">
-        <EditorContent 
-          editor={editor} 
+        <EditorContent
+          editor={editor}
           className="prose prose-sm sm:prose lg:prose-lg xl:prose-2xl max-w-none"
         />
       </div>

@@ -25,6 +25,7 @@ export default function EventsPage() {
         setError(result.error);
         toast.error(result.error);
       } else {
+        console.log('Fetched events data:', result.data);
         setEvents(result.data || []);
       }
       

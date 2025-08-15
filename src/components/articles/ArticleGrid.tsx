@@ -22,14 +22,14 @@ interface ArticleGridProps {
 const ArticleGrid = ({ articles, showFilters = false }: ArticleGridProps) => {
   const { language } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   
   const filteredArticles = articles.filter(article => {
     const matchesSearch = searchQuery === '' || 
       article.title[language].toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.content[language].toLowerCase().includes(searchQuery.toLowerCase());
       
-    const matchesCategory = selectedCategory === '' || article.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
     
     return matchesSearch && matchesCategory;
   });
@@ -85,7 +85,7 @@ const ArticleGrid = ({ articles, showFilters = false }: ArticleGridProps) => {
                   <SelectValue placeholder={language === 'en' ? 'All Categories' : 'Бүх ангилал'} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">
+                  <SelectItem value="all">
                     {language === 'en' ? 'All Categories' : 'Бүх ангилал'}
                   </SelectItem>
                   {categories.map(category => (
@@ -98,13 +98,13 @@ const ArticleGrid = ({ articles, showFilters = false }: ArticleGridProps) => {
             </div>
             
             {/* Clear Filters */}
-            {(searchQuery || selectedCategory) && (
+            {(searchQuery || (selectedCategory && selectedCategory !== 'all')) && (
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => {
                   setSearchQuery('');
-                  setSelectedCategory('');
+                  setSelectedCategory('all');
                 }}
                 className="flex items-center gap-2 whitespace-nowrap"
               >
@@ -169,7 +169,7 @@ const ArticleGrid = ({ articles, showFilters = false }: ArticleGridProps) => {
             variant="outline" 
             onClick={() => {
               setSearchQuery('');
-              setSelectedCategory('');
+              setSelectedCategory('all');
             }}
           >
             {language === 'en' ? 'Reset Filters' : 'Шүүлтүүр сэргээх'}

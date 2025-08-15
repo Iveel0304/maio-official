@@ -8,37 +8,63 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatDate(dateString: string, language: Language = 'en'): string {
-  const date = new Date(dateString);
+  if (!dateString) {
+    return language === 'en' ? 'No date' : 'Огноо байхгүй';
+  }
   
-  if (language === 'en') {
-    return format(date, 'MMMM d, yyyy');
-  } else {
-    // Proper Mongolian date format: Year-Month-Day
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  try {
+    const date = new Date(dateString);
+    
+    if (isNaN(date.getTime())) {
+      return language === 'en' ? 'Invalid date' : 'Буруу огноо';
+    }
+    
+    if (language === 'en') {
+      return format(date, 'MMMM d, yyyy');
+    } else {
+      // Proper Mongolian date format: Year-Month-Day
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+  } catch (error) {
+    console.warn('Error formatting date:', dateString, error);
+    return language === 'en' ? 'Invalid date' : 'Буруу огноо';
   }
 }
 
 export function formatDateLong(dateString: string, language: Language = 'en'): string {
-  const date = new Date(dateString);
+  if (!dateString) {
+    return language === 'en' ? 'No date' : 'Огноо байхгүй';
+  }
   
-  if (language === 'en') {
-    return format(date, 'MMMM d, yyyy');
-  } else {
-    // Mongolian long date format
-    const mongolianMonths = [
-      '1-р сар', '2-р сар', '3-р сар', '4-р сар',
-      '5-р сар', '6-р сар', '7-р сар', '8-р сар',
-      '9-р сар', '10-р сар', '11-р сар', '12-р сар'
-    ];
+  try {
+    const date = new Date(dateString);
     
-    const year = date.getFullYear();
-    const month = mongolianMonths[date.getMonth()];
-    const day = date.getDate();
+    if (isNaN(date.getTime())) {
+      return language === 'en' ? 'Invalid date' : 'Буруу огноо';
+    }
     
-    return `${year} оны ${month} ${day}`;
+    if (language === 'en') {
+      return format(date, 'MMMM d, yyyy');
+    } else {
+      // Mongolian long date format
+      const mongolianMonths = [
+        '1-р сар', '2-р сар', '3-р сар', '4-р сар',
+        '5-р сар', '6-р сар', '7-р сар', '8-р сар',
+        '9-р сар', '10-р сар', '11-р сар', '12-р сар'
+      ];
+      
+      const year = date.getFullYear();
+      const month = mongolianMonths[date.getMonth()];
+      const day = date.getDate();
+      
+      return `${year} оны ${month} ${day}`;
+    }
+  } catch (error) {
+    console.warn('Error formatting date long:', dateString, error);
+    return language === 'en' ? 'Invalid date' : 'Буруу огноо';
   }
 }
 

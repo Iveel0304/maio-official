@@ -15,8 +15,24 @@ interface ArticleCardProps {
 const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
   const { language, t } = useLanguage();
   
-  const publishDate = new Date(article.publishDate);
-  const timeAgo = formatDistanceToNow(publishDate, { addSuffix: true });
+  // Safely get title and summary with fallbacks
+  const safeTitle = article.title || { en: 'Untitled Article', mn: 'Гарчиггүй нийтлэл' };
+  const safeSummary = article.summary || { en: 'No summary available', mn: 'Товч агуулга байхгүй' };
+  
+  // Handle both MongoDB (publishDate) and Supabase (publish_date) field names
+  const dateString = article.publishDate || article.publish_date;
+  let timeAgo = 'Unknown';
+  
+  if (dateString) {
+    try {
+      const publishDate = new Date(dateString);
+      if (!isNaN(publishDate.getTime())) {
+        timeAgo = formatDistanceToNow(publishDate, { addSuffix: true });
+      }
+    } catch (error) {
+      console.warn('Invalid date format:', dateString, error);
+    }
+  }
   
   const categoryLabels = {
     en: {
@@ -43,8 +59,8 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
         <Link to={`/news/${article._id || article.id}`}>
           <div className="aspect-video relative overflow-hidden">
             <img 
-              src={article.imageUrl || '/images/placeholder.jpg'}
-              alt={t(article.title)}
+              src={article.imageUrl || article.image_url || '/images/placeholder.jpg'}
+              alt={t(safeTitle)}
               className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
             />
           </div>
@@ -63,14 +79,14 @@ const ArticleCard = ({ article, featured = false }: ArticleCardProps) => {
           </div>
           <Link to={`/news/${article._id || article.id}`} className="hover:underline">
             <h3 className={`font-bold ${featured ? 'text-2xl' : 'text-xl'}`}>
-              {t(article.title)}
+              {t(safeTitle)}
             </h3>
           </Link>
         </CardHeader>
         
         <CardContent className="pb-2 flex-grow">
           <p className="text-muted-foreground line-clamp-3">
-            {t(article.summary)}
+            {t(safeSummary)}
           </p>
         </CardContent>
         

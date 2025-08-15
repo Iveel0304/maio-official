@@ -90,8 +90,8 @@ const HeroBanner = ({
                   🔥
                 </motion.span>
                 {language === "en"
-                  ? "MAIO 2025 Registration Coming Soon"
-                  : "MAIO 2025 Бүртгэл Тун Удахгүй"}
+                  ? "MAIO 2026 Registration Coming Soon"
+                  : "MAIO 2026 Бүртгэл Тун Удахгүй"}
               </Badge>
             </motion.div>
 
@@ -166,7 +166,9 @@ const HeroBanner = ({
               >
                 <Link to="/register" className="flex items-center">
                   <Trophy className="mr-2 h-5 w-5" />
-                  {language === "en" ? "Register Now" : "Одоо бүртгүүлэх"}
+                  {language === "en"
+                    ? "Register Now - N/A"
+                    : "Одоо бүртгүүлэх - N/A"}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
@@ -223,7 +225,7 @@ const HeroBanner = ({
                   </motion.div>
 
                   <h3 className="text-3xl font-bold mb-2">
-                    MAIO 2025 - {language === "en" ? "Round 1" : "1-р шат"}
+                    MAIO 2026 - {language === "en" ? "Round 1" : "1-р шат"}
                   </h3>
 
                   <div className="space-y-3 mb-6">

@@ -14,6 +14,9 @@ interface EventScheduleProps {
 const EventSchedule = ({ events }: EventScheduleProps) => {
   const { language, t } = useLanguage();
   const [activeTab, setActiveTab] = useState<string>('upcoming');
+  
+  // Debug events data
+  console.log('EventSchedule received events:', events);
 
   // Get current date without time
   const today = new Date();
@@ -79,14 +82,16 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
                           <div className="md:w-1/4 h-auto">
                             <img 
                               src={event.imageUrl} 
-                              alt={t(event.title)} 
+                              alt={event.title ? t(event.title) : 'Event image'}
                               className="w-full h-full object-cover aspect-video md:aspect-square" 
                             />
                           </div>
                         )}
                         
                         <div className={`p-6 ${event.imageUrl ? 'md:w-3/4' : 'w-full'}`}>
-                          <h4 className="text-lg font-bold mb-2">{t(event.title)}</h4>
+                          <h4 className="text-lg font-bold mb-2">
+                            {event.title ? t(event.title) : 'Untitled Event'}
+                          </h4>
                           <div className="space-y-3 mb-4">
                             <div className="flex items-center gap-2">
                               <Clock className="h-4 w-4 text-muted-foreground" />
@@ -94,10 +99,17 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
                             </div>
                             <div className="flex items-center gap-2">
                               <MapPin className="h-4 w-4 text-muted-foreground" />
-                              <span>{typeof event.location === 'string' ? event.location : t(event.location)}</span>
+                              <span>
+                                {event.location ? 
+                                  (typeof event.location === 'string' ? event.location : t(event.location)) 
+                                  : 'TBD'
+                                }
+                              </span>
                             </div>
                           </div>
-                          <p className="text-muted-foreground">{t(event.description)}</p>
+                          <p className="text-muted-foreground">
+                            {event.description ? t(event.description) : 'No description available'}
+                          </p>
                         </div>
                       </div>
                     </CardContent>
@@ -131,7 +143,7 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
                       <div className="md:w-1/4 h-auto">
                         <img 
                           src={event.imageUrl} 
-                          alt={t(event.title)} 
+                          alt={event.title ? t(event.title) : 'Event image'}
                           className="w-full h-full object-cover aspect-video md:aspect-square" 
                         />
                       </div>
@@ -144,7 +156,9 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
                           {formatEventDate(event.date)}
                         </span>
                       </div>
-                      <h4 className="text-lg font-bold mb-2">{t(event.title)}</h4>
+                      <h4 className="text-lg font-bold mb-2">
+                        {event.title ? t(event.title) : 'Untitled Event'}
+                      </h4>
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
@@ -152,10 +166,17 @@ const EventSchedule = ({ events }: EventScheduleProps) => {
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span>{typeof event.location === 'string' ? event.location : t(event.location)}</span>
+                          <span>
+                            {event.location ? 
+                              (typeof event.location === 'string' ? event.location : t(event.location)) 
+                              : 'TBD'
+                            }
+                          </span>
                         </div>
                       </div>
-                      <p className="text-muted-foreground">{t(event.description)}</p>
+                      <p className="text-muted-foreground">
+                        {event.description ? t(event.description) : 'No description available'}
+                      </p>
                     </div>
                   </div>
                 </CardContent>

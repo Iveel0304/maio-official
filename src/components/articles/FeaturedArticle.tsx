@@ -14,6 +14,13 @@ interface FeaturedArticleProps {
 const FeaturedArticle = ({ article }: FeaturedArticleProps) => {
   const { language, t } = useLanguage();
   
+  // Safely get title and summary with fallbacks
+  const safeTitle = article.title || { en: 'Featured Article', mn: 'Онцолсон нийтлэл' };
+  const safeSummary = article.summary || { en: 'Featured content', mn: 'Онцолсон агуулга' };
+  
+  // Handle both MongoDB (publishDate) and Supabase (publish_date) field names
+  const dateString = article.publishDate || article.publish_date || new Date().toISOString();
+  
   const categoryLabels = {
     en: {
       announcement: 'Announcement',
@@ -38,8 +45,8 @@ const FeaturedArticle = ({ article }: FeaturedArticleProps) => {
       <div className="relative h-[60vh] max-h-[600px] w-full">
         <div className="absolute inset-0">
           <img
-            src={article.imageUrl || '/images/placeholder.jpg'}
-            alt={t(article.title)}
+            src={article.imageUrl || article.image_url || '/images/placeholder.jpg'}
+            alt={t(safeTitle)}
             className="object-cover w-full h-full"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
@@ -51,16 +58,16 @@ const FeaturedArticle = ({ article }: FeaturedArticleProps) => {
               {categoryLabels[language][article.category as keyof typeof categoryLabels.en] || article.category}
             </Badge>
             <span className="text-muted-foreground text-sm">
-              {formatDate(article.publishDate, language)}
+              {formatDate(dateString, language)}
             </span>
           </div>
           
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-white">
-            {t(article.title)}
+            {t(safeTitle)}
           </h1>
           
           <p className="text-lg text-muted-foreground max-w-3xl mb-6 text-white/80">
-            {t(article.summary)}
+            {t(safeSummary)}
           </p>
           
           <Button size="lg" asChild>

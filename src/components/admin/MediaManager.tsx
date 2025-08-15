@@ -12,7 +12,7 @@ import { mediaApi } from '@/lib/api';
 import { toast } from 'sonner';
 
 interface MediaItem {
-  _id?: string;
+  id?: string;
   title: string;
   description?: string;
   category: string;
@@ -328,7 +328,7 @@ export default function MediaManager() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {mediaItems.map((item) => (
-            <Card key={item._id} className="overflow-hidden">
+            <Card key={item.id} className="overflow-hidden">
               <div className="aspect-square relative bg-muted">
                 {item.type === 'image' ? (
                   <img
@@ -393,7 +393,7 @@ export default function MediaManager() {
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => handleDelete(item._id!)}
+                      onClick={() => handleDelete(item.id!)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
