@@ -10,7 +10,8 @@
     "build": "vite build",
     "lint": "eslint --quiet ./src",
     "preview": "vite preview",
-    "start": "npm run dev:full"
+    "start": "pnpm install --no-frozen-lockfile && npm run dev:full",
+    "update-locks": "rm -f pnpm-lock.yaml && pnpm install"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
